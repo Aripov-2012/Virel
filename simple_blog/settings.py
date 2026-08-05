@@ -181,3 +181,7 @@ SOCIALACCOUNT_PROVIDERS = {
         }
     }
 }
+
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+WHITENOISE_MANIFEST_STRICT = False
