@@ -1,0 +1,92 @@
+﻿{% extends "base.html" %}
+
+{% block title %}Мои подписки{% endblock %}
+
+{% block content %}
+<h1 class="page-title">Мои подписки</h1>
+<section class="layout-three">
+    <aside class="side-stack">
+        <section class="glass-card">
+            <p class="mini-title">Меню</p>
+            <div class="list-links">
+                <a class="btn btn-secondary" href="{% url 'home' %}">Главная</a>
+                <a class="btn btn-secondary" href="{% url 'blog_page' %}">Все посты</a>
+                <a class="btn btn-secondary" href="{% url 'admin_page' %}">Админка</a>
+                <a class="btn" href="{% url 'create_post' %}">Создать пост</a>
+            </div>
+        </section>
+    </aside>
+
+    <section class="side-stack">
+        <section class="glass-card">
+            <p class="mini-title">Пользователи, на которых вы подписаны</p>
+            {% if subscribed_users %}
+                <div class="stack">
+                    {% for profile in subscribed_users %}
+                        <div class="metric">
+                            <p class="v text-16 m-0">
+                                <a href="{% url 'profile_page' profile.id %}">{{ profile.username }}</a>
+                            </p>
+                            <p class="k mt-6">{{ profile.email }}</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="meta">Вы ещё не подписаны ни на одного пользователя.</p>
+            {% endif %}
+        </section>
+
+        <section class="glass-card">
+            <p class="mini-title">Последние посты подписок</p>
+            {% for post in posts %}
+                <article class="post-card post-card--compact">
+                    <h3 class="m-0 mb-8">{{ post.title }}</h3>
+                    <div class="post-content m-0 mb-10">
+                        {% if post.content|length > 150 %}
+                            <span class="post-content-short post-content-text">{{ post.content|truncatechars:150 }}</span>
+                            <span class="post-content-full post-content-text">{{ post.content }}</span>
+                            <button type="button" class="btn btn-secondary post-content-toggle mt-8">Показать полностью</button>
+                        {% else %}
+                            <span class="post-content-text">{{ post.content }}</span>
+                        {% endif %}
+                    </div>
+                    <p class="meta m-0 mb-8">
+                        Автор: <a href="{% url 'profile_page' post.author.id %}">{{ post.author }}</a> | {{ post.created_at }}
+                    </p>
+                    {% if post.image %}
+                        <img src="{{ post.image.url }}" alt="{{ post.title }}" class="media mb-8" loading="lazy">
+                    {% endif %}
+                    {% if post.attachment %}
+                        <p class="mt-8">
+                            <a href="{{ post.attachment.url }}" target="_blank" rel="noopener">Скачать вложение</a>
+                        </p>
+                    {% endif %}
+                </article>
+            {% empty %}
+                <p class="meta">Нет постов от подписанных пользователей.</p>
+            {% endfor %}
+        </section>
+    </section>
+
+    <aside class="side-stack">
+        <section class="glass-card">
+            <p class="mini-title">Статистика</p>
+            <ul class="stat-list">
+                <li class="stat-row">
+                    <span class="stat-label">Подписки</span>
+                    <span class="stat-value">{{ subscribed_users|length }}</span>
+                </li>
+                <li class="stat-row">
+                    <span class="stat-label">Посты</span>
+                    <span class="stat-value">{{ posts|length }}</span>
+                </li>
+                <li class="stat-row">
+                    <span class="stat-label">Лайки</span>
+                    <span class="stat-value">—</span>
+                </li>
+            </ul>
+        </section>
+    </aside>
+</section>
+{% endblock %}
+

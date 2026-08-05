@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}Чаты{% endblock %}
+
+{% block content %}
+<h1 class="page-title">Сообщения</h1>
+<section class="layout-two">
+    <section class="side-stack">
+        {% if chat_cards %}
+            <div class="chat-list">
+                {% for chat in chat_cards %}
+                    <a class="chat-row" href="{% url 'chat_room' chat.id %}">
+                        <span class="chat-row-avatar">{{ chat.title|slice:":1" }}</span>
+                        <span class="chat-row-body">
+                            <span class="chat-row-title">{{ chat.title }}</span>
+                            <span class="chat-row-preview">
+                                {% if chat.last_message %}
+                                    {{ chat.last_message.sender.username }}: {{ chat.last_message.text|truncatechars:60 }}
+                                {% else %}
+                                    Сообщений пока нет
+                                {% endif %}
+                            </span>
+                        </span>
+                    </a>
+                {% endfor %}
+            </div>
+        {% else %}
+            <section class="glass-card empty-state">
+                <svg class="ic empty-state-icon" aria-hidden="true"><use href="#i-send"></use></svg>
+                <h2>Пока нет диалогов</h2>
+                <p class="meta">Откройте профиль пользователя и нажмите «Написать сообщение», чтобы начать общение.</p>
+                <a class="btn" href="{% url 'blog_page' %}">Перейти в ленту</a>
+            </section>
+        {% endif %}
+    </section>
+</section>
+{% endblock %}

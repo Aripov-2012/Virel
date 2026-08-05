@@ -1,0 +1,11 @@
+How to run with ASGI
+
+python -m daphne simple_blog.asgi:application - localhost:8000
+python -m daphne -b 0.0.0.0 -p 8000 simple_blog.asgi:application - 0.0.0.0:8000
+
+
+
+How to run with WSGI (disables chatting)
+
+python manage.py runserver - localhost:8000
+python manage.py runserver 0.0.0.0:8000 - 0.0.0.0:8000

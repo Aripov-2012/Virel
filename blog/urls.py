@@ -1,0 +1,58 @@
+from django.urls import path
+from django.conf import settings
+from django.conf.urls.static import static
+from .views import (
+    add_comment,
+    admin_page,
+    blog_page,
+    create_post,
+    delete_post,
+    edit_profile,
+    chat_list,
+    chat_room,
+    for_you_feed,
+    home,
+    login_phone,
+    posts_by_tag,
+    profile_page,
+    register,
+    register_phone,
+    saved_posts_page,
+    start_chat,
+    subscriptions_feed,
+    toggle_comment_like,
+    toggle_post_like,
+    toggle_save_post,
+    toggle_subscription,
+    track_post_view,
+    update_post,
+)
+
+urlpatterns = [
+    path('', home, name='home'),
+    path('register/', register, name='register'),
+    path('register/phone/', register_phone, name='register_phone'),
+    path('login/phone/', login_phone, name='login_phone'),
+    path('blog/', blog_page, name='blog_page'),
+    path('for-you/', for_you_feed, name='for_you_feed'),
+    path('tag/<slug:slug>/', posts_by_tag, name='posts_by_tag'),
+    path('view/<int:id>/', track_post_view, name='track_post_view'),
+    path('admin-page/', admin_page, name='admin_page'),
+    path('create/', create_post, name='create_post'),
+    path('update/<int:id>/', update_post, name='update_post'),
+    path('delete/<int:id>/', delete_post, name='delete_post'),
+    path('profile/edit/', edit_profile, name='edit_profile'),
+    path('comment/<int:id>/', add_comment, name='add_comment'),
+    path('like/post/<int:id>/', toggle_post_like, name='toggle_post_like'),
+    path('like/comment/<int:id>/', toggle_comment_like, name='toggle_comment_like'),
+    path('subscribe/<int:user_id>/', toggle_subscription, name='toggle_subscription'),
+    path('subscriptions/', subscriptions_feed, name='subscriptions_feed'),
+    path('profile/<int:user_id>/', profile_page, name='profile_page'),
+    path('chats/', chat_list, name='chat_list'),
+    path('chats/start/<int:user_id>/', start_chat, name='start_chat'),
+    path('chats/<int:conversation_id>/', chat_room, name='chat_room'),
+    path('save/<int:id>/', toggle_save_post, name='toggle_save_post'),
+    path('saved/', saved_posts_page, name='saved_posts_page'),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+

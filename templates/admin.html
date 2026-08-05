@@ -1,0 +1,99 @@
+﻿{% extends "base.html" %}
+
+{% block title %}Админка{% endblock %}
+
+
+{% block content %}
+<h1 class="page-title">Управление постами</h1>
+<section class="layout-three">
+    <aside class="side-stack">
+        <section class="glass-card">
+            <p class="mini-title">Меню</p>
+            <div class="list-links">
+                <a href="{% url 'home' %}" class="btn btn-secondary">Главная</a>
+                <a href="{% url 'blog_page' %}" class="btn btn-secondary">Все посты</a>
+                <a href="{% url 'create_post' %}" class="btn">Создать пост</a>
+            </div>
+        </section>
+    </aside>
+
+    <section class="admin-list">
+        <section class="glass-card">
+            <form method="get" class="admin-filters">
+                <select name="sort">
+                    <option value="new" {% if current_sort == "new" %}selected{% endif %}>Сначала новые</option>
+                    <option value="popular" {% if current_sort == "popular" %}selected{% endif %}>Популярные</option>
+                </select>
+                <button type="submit">Применить</button>
+            </form>
+        </section>
+
+        {% for post in posts %}
+        <article class="glass-card post-card">
+            <div class="admin-post">
+                <div class="admin-post-main">
+                    {% if post.image %}
+                        <div class="media-wrap loading">
+                            <img src="{{ post.image.url }}" alt="{{ post.title }}" class="media lazy-media" loading="lazy">
+                        </div>
+                    {% endif %}
+
+                    {% if post.attachment %}
+                        {% if post.is_video_attachment %}
+                            <div class="media-wrap">
+                                <video controls preload="metadata" class="media">
+                                    <source src="{{ post.attachment.url }}">
+                                    Ваш браузер не поддерживает воспроизведение видео.
+                                </video>
+                            </div>
+                        {% elif post.is_audio_attachment %}
+                            <div class="media-wrap">
+                                <audio controls preload="metadata" class="media audio">
+                                    <source src="{{ post.attachment.url }}">
+                                </audio>
+                            </div>
+                        {% else %}
+                            <div class="file-link">
+                                <span class="file-icon" aria-hidden="true">📄</span>
+                                <a class="file-name" href="{{ post.attachment.url }}" target="_blank" rel="noopener">{{ post.attachment_name }}</a>
+                            </div>
+                        {% endif %}
+                    {% endif %}
+
+                    <h2 class="m-0 mb-8">{{ post.title }}</h2>
+                    <div class="post-content m-0">
+                        {% if post.content|length > 150 %}
+                            <span class="post-content-short post-content-text">{{ post.content|truncatechars:150 }}</span>
+                            <span class="post-content-full post-content-text">{{ post.content }}</span>
+                            <button type="button" class="btn btn-secondary post-content-toggle mt-8">Показать полностью</button>
+                        {% else %}
+                            <span class="post-content-text">{{ post.content }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="meta">{{ post.created_at }}</div>
+                </div>
+
+                <aside class="admin-actions">
+                    <a href="{% url 'update_post' post.id %}" class="btn btn-secondary">Редактировать</a>
+                    <a href="{% url 'delete_post' post.id %}" class="btn btn-danger">Удалить</a>
+                </aside>
+            </div>
+        </article>
+        {% empty %}
+            <section class="glass-card">
+                <p class="meta">Постов пока нет.</p>
+            </section>
+        {% endfor %}
+    </section>
+
+    <aside class="side-stack">
+        <section class="glass-card">
+            <p class="mini-title">Быстрые действия</p>
+            <a href="{% url 'create_post' %}" class="btn">Создать пост</a>
+        </section>
+    </aside>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}{% endblock %}
+

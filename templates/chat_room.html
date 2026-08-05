@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}Чат с {{ chat_title }}{% endblock %}
+
+{% block content %}
+<h1 class="page-title">Чат с {{ chat_title }}</h1>
+<section class="layout-two">
+    <section class="side-stack">
+        <section class="chat-wrap">
+            <div id="chatMessages" class="chat-messages">
+                {% for message in messages %}
+                    <div class="chat-bubble {% if message.sender_id == user.id %}chat-bubble--me{% endif %}">
+                        <div class="chat-meta">
+                            {{ message.sender.username }} · {{ message.created_at|date:"Y-m-d H:i" }}
+                        </div>
+                        <div class="chat-text">{{ message.text }}</div>
+                    </div>
+                {% endfor %}
+            </div>
+            <form id="chatForm" class="chat-form" autocomplete="off">
+                <input id="chatInput" type="text" placeholder="Напишите сообщение..." />
+                <button type="submit" class="btn">Отправить</button>
+            </form>
+        </section>
+    </section>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    (function () {
+        const conversationId = "{{ conversation.id }}";
+        const chatMessages = document.getElementById("chatMessages");
+        const chatForm = document.getElementById("chatForm");
+        const chatInput = document.getElementById("chatInput");
+
+        const protocol = window.location.protocol === "https:" ? "wss" : "ws";
+        const socket = new WebSocket(`${protocol}://${window.location.host}/ws/chat/${conversationId}/`);
+
+        const appendMessage = (sender, text, timestamp, isMe) => {
+            const bubble = document.createElement("div");
+            bubble.className = `chat-bubble${isMe ? " chat-bubble--me" : ""}`;
+
+            const meta = document.createElement("div");
+            meta.className = "chat-meta";
+            meta.textContent = `${sender} · ${timestamp}`;
+
+            const body = document.createElement("div");
+            body.className = "chat-text";
+            body.textContent = text;
+
+            bubble.appendChild(meta);
+            bubble.appendChild(body);
+            chatMessages.appendChild(bubble);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        };
+
+        socket.addEventListener("message", (event) => {
+            const data = JSON.parse(event.data);
+            if (!data.message) {
+                return;
+            }
+            const isMe = Number(data.sender_id) === Number("{{ user.id }}");
+            appendMessage(data.sender, data.message, data.timestamp, isMe);
+        });
+
+        const stripBidiControls = (value) => {
+            return value.replace(/[\u200E\u200F\u061C\u202A-\u202E\u2066-\u2069]/g, "");
+        };
+
+        chatForm.addEventListener("submit", (event) => {
+            event.preventDefault();
+            const text = stripBidiControls(chatInput.value).trim();
+            if (!text || socket.readyState !== WebSocket.OPEN) {
+                return;
+            }
+            socket.send(JSON.stringify({ message: text.normalize("NFC") }));
+            chatInput.value = "";
+        });
+
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    })();
+</script>
+{% endblock %}

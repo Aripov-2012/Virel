@@ -1,0 +1,44 @@
+﻿{% extends "base.html" %}
+
+{% block title %}Удаление поста{% endblock %}
+
+{% block content %}
+<h1 class="page-title">Удаление поста</h1>
+<section class="layout-two">
+    <section class="glass-card">
+        <h2 class="mt-0">Вы уверены, что хотите удалить этот пост?</h2>
+        <p class="meta mt-0">Это действие необратимо.</p>
+
+        <div class="glass-panel panel-spaced">
+            <h3 class="m-0 mb-8">{{ post.title }}</h3>
+            <div class="post-content m-0">
+                {% if post.content|length > 150 %}
+                    <span class="post-content-short post-content-text">{{ post.content|truncatechars:150 }}</span>
+                    <span class="post-content-full post-content-text">{{ post.content }}</span>
+                    <button type="button" class="btn btn-secondary post-content-toggle mt-8">Показать полностью</button>
+                {% else %}
+                    <span class="post-content-text">{{ post.content }}</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <form method="POST" class="form-actions">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Да, удалить</button>
+            <a href="{% url 'admin_page' %}" class="btn btn-secondary">Отмена</a>
+        </form>
+    </section>
+
+    <aside class="side-stack">
+        <section class="glass-card">
+            <p class="mini-title">Быстрая навигация</p>
+            <div class="list-links">
+                <a href="{% url 'home' %}" class="btn btn-secondary">Главная</a>
+                <a href="{% url 'admin_page' %}" class="btn btn-secondary">Все посты в админке</a>
+                <a href="{% url 'update_post' post.id %}" class="btn btn-secondary">Редактировать пост</a>
+            </div>
+        </section>
+    </aside>
+</section>
+{% endblock %}
+

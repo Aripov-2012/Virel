@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}Редактирование поста{% endblock %}
+
+{% block content %}
+<h1 class="page-title">Редактирование поста</h1>
+<section class="layout-three">
+    <aside class="side-stack">
+        <section class="glass-card">
+            <p class="mini-title">Меню пользователя</p>
+            <div class="list-links">
+                <a href="{% url 'home' %}" class="btn btn-secondary">Главная</a>
+                <a href="{% url 'admin_page' %}" class="btn btn-secondary">Все мои посты</a>
+                <a href="{% url 'delete_post' post.id %}" class="btn btn-danger">Удалить пост</a>
+            </div>
+        </section>
+    </aside>
+
+    <section class="glass-card">
+        <h2 class="mt-0">Редактирование содержимого поста</h2>
+        <form method="POST" enctype="multipart/form-data" class="stack">
+            {% csrf_token %}
+            <div>
+                <label>Заголовок</label>
+                <input type="text" name="title" value="{{ post.title }}" required>
+            </div>
+            <div>
+                <label>Содержание</label>
+                <textarea name="content" rows="7" required>{{ post.content }}</textarea>
+            </div>
+            <div>
+                <label>Изображение</label>
+                {% if post.image %}
+                    <div class="media-wrap loading">
+                        <img src="{{ post.image.url }}" alt="{{ post.title }}" class="media lazy-media" loading="lazy">
+                    </div>
+                    <label class="form-inline-label">
+                        <input type="checkbox" name="remove_image" value="1">
+                        Удалить текущее изображение
+                    </label>
+                {% else %}
+                    <p class="meta mb-8">Изображение не загружено.</p>
+                {% endif %}
+                <input type="file" name="image">
+            </div>
+            <div>
+                <label>Вложение</label>
+                {% if post.attachment %}
+                    <div class="file-link">
+                        <span class="file-icon" aria-hidden="true">📎</span>
+                        <a class="file-name" href="{{ post.attachment.url }}" target="_blank" rel="noopener">{{ post.attachment_name }}</a>
+                    </div>
+                    <label class="form-inline-label">
+                        <input type="checkbox" name="remove_attachment" value="1">
+                        Удалить текущее вложение
+                    </label>
+                {% else %}
+                    <p class="meta mb-8">Вложение не загружено.</p>
+                {% endif %}
+                <input type="file" name="attachment">
+            </div>
+            <div>
+                <label>Теги</label>
+                <input type="text" name="tags" value="{% for tag in post.tags.all %}{{ tag.name }}{% if not forloop.last %}, {% endif %}{% endfor %}" placeholder="технологии, спорт, музыка">
+                <p class="field-hint">Введите теги через запятую.</p>
+            </div>
+            <button type="submit">Сохранить изменения</button>
+        </form>
+    </section>
+
+    <aside class="side-stack">
+        <section class="glass-card">
+            <p class="mini-title">Статистика</p>
+            <ul class="stat-list">
+                <li class="stat-row">
+                    <span class="stat-label">Постов</span>
+                    <span class="stat-value">—</span>
+                </li>
+                <li class="stat-row">
+                    <span class="stat-label">Просмотров</span>
+                    <span class="stat-value">—</span>
+                </li>
+                <li class="stat-row">
+                    <span class="stat-label">Лайков</span>
+                    <span class="stat-value">—</span>
+                </li>
+            </ul>
+        </section>
+    </aside>
+</section>
+{% endblock %}

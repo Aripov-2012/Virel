@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}Редактировать профиль{% endblock %}
+
+{% block content %}
+<h1 class="page-title">Редактировать профиль</h1>
+<section class="layout-two">
+    <section class="glass-card">
+        <h2 class="mt-0">Профиль</h2>
+        <form method="post" enctype="multipart/form-data" class="stack">
+            {% csrf_token %}
+            <div>
+                <label for="id_username">Имя пользователя</label>
+                <input id="id_username" type="text" name="username" value="{{ request.user.username }}" placeholder="Введите имя пользователя">
+            </div>
+            <div>
+                <label for="id_email">Email</label>
+                <input id="id_email" type="email" name="email" value="{{ request.user.email }}" placeholder="Введите email">
+            </div>
+            <div>
+                <label for="id_bio">О себе</label>
+                <textarea id="id_bio" name="bio" rows="4" placeholder="Коротко о себе">{{ profile.bio }}</textarea>
+            </div>
+            <div>
+                <label class="form-inline-label" for="id_reverse_mobile_messages">
+                    <input id="id_reverse_mobile_messages" type="checkbox" name="reverse_mobile_messages" value="1" {% if profile.reverse_mobile_messages %}checked{% endif %}>
+                    Преоброзователь текста (Если текст заканчивается с заглавной буквы, то он будет преобразован в нижний регистр, и наоборот. Рекомендуется для мобильных устройств)
+                </label>
+            </div>
+            <div>
+                <label for="id_avatar">Аватар</label>
+                {% if profile.avatar %}
+                    <div class="media-wrap loading">
+                        <img src="{{ profile.avatar.url }}" alt="Аватар" class="media lazy-media" loading="lazy">
+                    </div>
+                    <label class="form-inline-label">
+                        <input type="checkbox" name="remove_avatar" value="1">
+                        Удалить текущий аватар
+                    </label>
+                {% else %}
+                    <p class="meta mb-8">Аватар не загружен.</p>
+                {% endif %}
+                <input id="id_avatar" type="file" name="avatar" accept="image/*">
+            </div>
+            <button type="submit">Сохранить</button>
+            <a href="{% url 'profile_page' request.user.id %}" class="btn btn-secondary text-center">Отмена</a>
+        </form>
+    </section>
+    <aside class="side-stack">
+        <section class="glass-card">
+            <p class="mini-title">Подсказки</p>
+            <p class="meta">Рекомендуем квадратное изображение и размер до 2 МБ.</p>
+        </section>
+    </aside>
+</section>
+{% endblock %}

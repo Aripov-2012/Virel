@@ -1,0 +1,73 @@
+﻿{% extends "base.html" %}
+
+{% block title %}Навигация{% endblock %}
+
+{% block content %}
+<h1 class="page-title">Навигация</h1>
+<section class="layout-three">
+    <aside class="side-stack">
+        <section class="glass-card">
+            <p class="mini-title">Меню</p>
+            <div class="list-links">
+                <a href="{% url 'home' %}" class="btn btn-secondary">Главная</a>
+                <a href="{% url 'blog_page' %}" class="btn btn-secondary">Все посты</a>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'subscriptions_feed' %}" class="btn btn-secondary">Мои подписки</a>
+                {% endif %}
+                <a href="{% url 'register' %}" class="btn btn-secondary">Регистрация</a>
+                <a href="{% url 'create_post' %}" class="btn">Создать пост</a>
+            </div>
+        </section>
+        <section class="glass-card">
+            <p class="mini-title">Пользователь</p>
+            {% if user.is_authenticated %}
+                <p class="meta m-0 mb-10">
+                    <a href="{% url 'profile_page' user.id %}">{{ user.username }}</a>
+                </p>
+                <form method="post" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button type="submit">Выйти</button>
+                </form>
+            {% else %}
+                <a href="{% url 'login' %}" class="btn">Войти</a>
+            {% endif %}
+        </section>
+    </aside>
+
+    <section class="side-stack">
+        <section class="glass-panel">
+            <h2 class="m-0 mb-8">Что нового на платформе?</h2>
+            <p class="meta text-14">Читайте последние посты, подписывайтесь на авторов и делитесь своими идеями с сообществом.</p>
+        </section>
+        <section class="glass-card">
+            <p class="mini-title">Статистика наших успехов</p>
+            <div class="metric-grid">
+                <div class="metric">
+                    <p class="k">Пользователи</p>
+                    <p class="v">{{ user_count }}</p>
+                </div>
+                <div class="metric">
+                    <p class="k">Посты</p>
+                    <p class="v">{{ post_count }}</p>
+                </div>
+                <div class="metric">
+                    <p class="k">Комментарии</p>
+                    <p class="v">{{ comment_count }}</p>
+                </div>
+            </div>
+        </section>
+    </section>
+
+    <aside class="side-stack">
+        <section class="glass-card">
+            <p class="mini-title">Быстрая навигация</p>
+            <div class="list-links">
+                <a href="{% url 'blog_page' %}" class="btn">Просмотреть посты</a>
+                <a href="{% url 'register' %}" class="btn btn-secondary">Регистрация</a>
+                <a href="{% url 'create_post' %}" class="btn btn-secondary">Создать пост</a>
+                <a href="https://github.com/Aripov-2012" target="_blank" class="btn btn-secondary">GitHub</a>
+            </div>
+        </section>
+    </aside>
+</section>
+{% endblock %}

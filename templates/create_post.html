@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}Создать пост{% endblock %}
+
+{% block content %}
+<h1 class="page-title">Создать новый пост</h1>
+<section class="layout-three">
+    <aside class="side-stack">
+        <section class="glass-card">
+            <p class="mini-title">Навигация</p>
+            <div class="list-links">
+                <a href="{% url 'home' %}" class="btn btn-secondary">Главная</a>
+                <a href="{% url 'admin_page' %}" class="btn btn-secondary">Управление постами</a>
+                <a href="{% url 'blog_page' %}" class="btn btn-secondary">Все посты</a>
+            </div>
+        </section>
+    </aside>
+
+    <section class="glass-card">
+        <h2 class="mt-0">Новый пост</h2>
+        <form method="POST" enctype="multipart/form-data" class="stack">
+            {% csrf_token %}
+            <div>
+                <label>Заголовок</label>
+                <input type="text" name="title" placeholder="Введите заголовок" required>
+                <p class="field-hint">Кратко и ясно опишите тему поста.</p>
+            </div>
+            <div>
+                <label>Содержание</label>
+                <textarea name="content" rows="7" placeholder="Введите текст поста" required></textarea>
+                <p class="field-hint">Напишите текст поста, 2–5 предложений.</p>
+            </div>
+            <div>
+                <label>Изображение</label>
+                <input type="file" name="image">
+            </div>
+            <div>
+                <label>Файл (pdf/zip/apk/exe)</label>
+                <input type="file" name="attachment">
+            </div>
+            <div>
+                <label>Теги</label>
+                <input type="text" name="tags" placeholder="технологии, спорт, музыка">
+                <p class="field-hint">Введите теги через запятую.</p>
+            </div>
+            <button type="submit">Создать пост</button>
+        </form>
+    </section>
+
+    <aside class="side-stack">
+        <section class="glass-card">
+            <p class="mini-title">Статистика</p>
+            <ul class="stat-list">
+                <li class="stat-row">
+                    <span class="stat-label">Постов</span>
+                    <span class="stat-value">123</span>
+                </li>
+                <li class="stat-row">
+                    <span class="stat-label">Подписчиков</span>
+                    <span class="stat-value">45</span>
+                </li>
+                <li class="stat-row">
+                    <span class="stat-label">Комментарии</span>
+                    <span class="stat-value">67</span>
+                </li>
+            </ul>
+        </section>
+    </aside>
+</section>
+{% endblock %}

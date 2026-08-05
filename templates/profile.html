@@ -1,0 +1,143 @@
+﻿{% extends "base.html" %}
+
+{% block title %}Профиль {{ profile_user.username }}{% endblock %}
+
+{% block content %}
+<h1 class="page-title">Профиль пользователя</h1>
+<section class="layout-three">
+    <aside class="side-stack">
+        <section class="glass-card">
+            <p class="mini-title">Меню</p>
+            <div class="list-links">
+                <a class="btn btn-secondary" href="{% url 'home' %}">Главная</a>
+                <a class="btn btn-secondary" href="{% url 'blog_page' %}">Все посты</a>
+                <a class="btn btn-secondary" href="{% url 'subscriptions_feed' %}">Мои подписки</a>
+                <a class="btn" href="{% url 'create_post' %}">Создать пост</a>
+            </div>
+        </section>
+    </aside>
+
+    <section class="side-stack">
+        <section class="glass-card">
+            <div class="profile-head">
+                <div class="avatar">
+                    {% if profile_user.profile.avatar %}
+                        <img src="{{ profile_user.profile.avatar.url }}" alt="Аватар {{ profile_user.username }}">
+                    {% else %}
+                        <span class="avatar-fallback">{{ profile_user.username|slice:":1" }}</span>
+                    {% endif %}
+                </div>
+                <div class="profile-meta">
+                    <h2 class="m-0 mb-8">{{ profile_user.username }}</h2>
+                    <p class="meta m-0 mb-6">Email: {{ profile_user.email|default:"Не указан" }}</p>
+                    <p class="meta m-0 mb-6">Дата регистрации: {{ profile_user.date_joined }}</p>
+                    <p class="meta m-0">Последний вход: {{ profile_user.last_login|default:"Не заходил" }}</p>
+                    {% if profile_user.profile.bio %}
+                    <br>
+                        <p class="meta m-0 mt-8">{{ profile_user.profile.bio }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if user.is_authenticated and user != profile_user %}
+                <div class="mt-12 list-links">
+                    <a class="btn" href="{% url 'start_chat' profile_user.id %}">Написать сообщение</a>
+                </div>
+                <form method="post" action="{% url 'toggle_subscription' profile_user.id %}" class="js-subscription-form mt-12">
+                    {% csrf_token %}
+                    {% if is_following %}
+                        <button type="submit" class="btn btn-secondary js-subscription-btn" data-subscribe-label="Подписаться" data-unsubscribe-label="Отписаться">Отписаться</button>
+                    {% else %}
+                        <button type="submit" class="btn js-subscription-btn" data-subscribe-label="Подписаться" data-unsubscribe-label="Отписаться">Подписаться</button>
+                    {% endif %}
+                </form>
+            {% endif %}
+            {% if user.is_authenticated and user == profile_user %}
+                <div class="mt-12">
+                    <a class="btn btn-secondary" href="{% url 'edit_profile' %}">Редактировать профиль</a>
+                </div>
+            {% endif %}
+        </section>
+
+        <section class="glass-card">
+            <p class="mini-title">Посты пользователя</p>
+            {% for post in posts %}
+                <article class="post-card post-card--compact">
+                    {% if post.image %}
+                        <div class="media-wrap loading">
+                            <img src="{{ post.image.url }}" alt="{{ post.title }}" class="media lazy-media" loading="lazy">
+                        </div>
+                    {% endif %}
+
+                    {% if post.attachment %}
+                        {% if post.is_video_attachment %}
+                            <div class="media-wrap">
+                                <video controls preload="metadata" class="media d-block">
+                                    <source src="{{ post.attachment.url }}">
+                                    <p>Ваш браузер не поддерживает воспроизведение видео.</p>
+                                </video>
+                            </div>
+                        {% elif post.is_audio_attachment %}
+                            <div class="media-wrap">
+                                <audio controls class="media audio" preload="metadata">
+                                    <source src="{{ post.attachment.url }}">
+                                </audio>
+                            </div>
+                        {% else %}
+                            <div class="file-link">
+                                <span class="file-icon" aria-hidden="true">📎</span>
+                                <a class="file-name" href="{{ post.attachment.url }}" target="_blank" rel="noopener">{{ post.attachment_name }}</a>
+                            </div>
+                        {% endif %}
+                    {% endif %}
+
+                    <h3 class="m-0 mb-8">{{ post.title }}</h3>
+                    <div class="post-content m-0 mb-8">
+                        {% if post.content|length > 150 %}
+                            <span class="post-content-short post-content-text">{{ post.content|truncatechars:150 }}</span>
+                            <span class="post-content-full post-content-text">{{ post.content }}</span>
+                            <button type="button" class="btn btn-secondary post-content-toggle mt-8">Показать полностью</button>
+                        {% else %}
+                            <span class="post-content-text">{{ post.content }}</span>
+                        {% endif %}
+                    </div>
+                    <p class="meta m-0 mb-6">
+                        Автор:
+                        {% if post.author %}
+                            <a href="{% url 'profile_page' post.author.id %}">{{ post.author }}</a>
+                        {% else %}
+                            Неизвестно
+                        {% endif %}
+                        | {{ post.created_at }}
+                    </p>
+                    <p class="meta m-0">Лайки: {{ post.likes.count }}</p>
+                </article>
+            {% empty %}
+                <p class="meta">У пользователя пока нет постов.</p>
+            {% endfor %}
+        </section>
+    </section>
+
+    <aside class="side-stack">
+        <section class="glass-card">
+            <p class="mini-title">Статистика</p>
+            <ul class="stat-list">
+                <li class="stat-row">
+                    <span class="stat-label">Постов</span>
+                    <span class="stat-value">{{ posts|length }}</span>
+                </li>
+                <li class="stat-row">
+                    <span class="stat-label">Подписчики</span>
+                    <span class="stat-value js-followers-count">{{ followers_count }}</span>
+                </li>
+                <li class="stat-row">
+                    <span class="stat-label">Подписки</span>
+                    <span class="stat-value">{{ following_count }}</span>
+                </li>
+            </ul>
+        </section>
+    </aside>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}{% endblock %}

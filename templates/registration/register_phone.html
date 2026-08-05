@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+
+{% block title %}Регистрация по телефону{% endblock %}
+
+{% block content %}
+<h1 class="page-title">Регистрация</h1>
+<section class="register-wrap">
+    <section class="glass-card">
+        {% if step == 'verify' %}
+            <h2 class="mt-0">Подтверждение номера</h2>
+            {% if messages %}
+                <div class="stack mb-12">
+                    {% for message in messages %}
+                        <div class="meta msg">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            <p class="meta mb-12">Код отправлен на номер <strong>{{ phone }}</strong></p>
+
+            <form method="post" class="stack">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="verify_code">
+                <input type="hidden" name="phone" value="{{ phone }}">
+                <input type="hidden" name="username" value="{{ username }}">
+
+                <div>
+                    <label for="id_code">Код подтверждения</label>
+                    <input id="id_code" type="text" name="code" required placeholder="000000"
+                           maxlength="6" pattern="[0-9]{6}" inputmode="numeric"
+                           autocomplete="one-time-code" autofocus>
+                    <p class="field-hint">Введите 6-значный код из SMS</p>
+                </div>
+
+                <div id="timerBlock" class="meta mb-12">
+                    <span>Код действителен: </span>
+                    <span id="countdown" class="countdown-timer">10:00</span>
+                </div>
+
+                {% if not expired %}
+                <button type="submit">Подтвердить</button>
+                {% endif %}
+            </form>
+
+            <form method="post" class="mt-12">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="resend_code">
+                <input type="hidden" name="phone" value="{{ phone }}">
+                <input type="hidden" name="username" value="{{ username }}">
+                <button type="submit" id="resendBtn" class="btn btn-secondary text-center" disabled>
+                    Отправить код повторно (<span id="resendTimer">60</span>с)
+                </button>
+            </form>
+
+            <a href="{% url 'register_phone' %}" class="btn btn-secondary text-center mt-12">Изменить данные</a>
+
+        {% else %}
+            <h2 class="mt-0">Создать аккаунт</h2>
+            {% if messages %}
+                <div class="stack mb-12">
+                    {% for message in messages %}
+                        <div class="meta msg">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            <form method="post" class="stack">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="send_code">
+
+                <div>
+                    <label for="id_username">Имя пользователя</label>
+                    <input id="id_username" type="text" name="username" required placeholder="Введите имя пользователя"
+                           value="{{ username|default:'' }}">
+                    <p class="field-hint">Это имя, которое будет видно другим пользователям.</p>
+                </div>
+                <div>
+                    <label for="id_phone">Номер телефона</label>
+                    <input id="id_phone" type="tel" name="phone" required placeholder="+998 XX XXX XX XX"
+                           value="{{ phone|default:'' }}" inputmode="tel">
+                    <p class="field-hint">На этот номер будет отправлен код подтверждения.</p>
+                </div>
+                <div>
+                    <label for="id_password">Пароль</label>
+                    <input id="id_password" type="password" name="password" required placeholder="Введите пароль">
+                    <p class="field-hint">Минимум 6 символов.</p>
+                </div>
+                <button type="submit">Получить код</button>
+                <a href="{% url 'register' %}" class="btn btn-secondary text-center">Регистрация по email</a>
+                <a href="{% url 'login' %}" class="btn btn-secondary text-center">Уже есть аккаунт?</a>
+            </form>
+        {% endif %}
+    </section>
+
+    <aside class="side-stack">
+        <section class="glass-card">
+            <p class="mini-title">Информация</p>
+            {% if step == 'verify' %}
+                <p class="meta">Введите 6-значный код из SMS. Код действителен 10 минут.</p>
+                <p class="meta mt-8">Если код не пришёл, вы можете запросить новый через 60 секунд.</p>
+            {% else %}
+                <p class="meta">Регистрация по номеру телефона. Вам будет отправлен SMS-код для подтверждения.</p>
+            {% endif %}
+        </section>
+    </aside>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+{% if step == 'verify' %}
+<script>
+(function() {
+    // Таймер обратного отсчёта 10 минут
+    const countdownEl = document.getElementById('countdown');
+    const resendBtn = document.getElementById('resendBtn');
+    const resendTimerEl = document.getElementById('resendTimer');
+    const timerBlock = document.getElementById('timerBlock');
+
+    let totalSeconds = 600; // 10 минут
+    let resendSeconds = 60;
+
+    function pad(n) { return n < 10 ? '0' + n : n; }
+
+    function updateCountdown() {
+        if (totalSeconds <= 0) {
+            countdownEl.textContent = '00:00';
+            timerBlock.innerHTML = '<span class="text-danger">Срок действия кода истёк</span>';
+            clearInterval(mainTimer);
+            return;
+        }
+        const m = Math.floor(totalSeconds / 60);
+        const s = totalSeconds % 60;
+        countdownEl.textContent = pad(m) + ':' + pad(s);
+        totalSeconds--;
+    }
+
+    function updateResend() {
+        if (resendSeconds <= 0) {
+            resendBtn.disabled = false;
+            resendBtn.innerHTML = 'Отправить код повторно';
+            clearInterval(resendTimer);
+            return;
+        }
+        resendTimerEl.textContent = resendSeconds;
+        resendSeconds--;
+    }
+
+    updateCountdown();
+    updateResend();
+
+    const mainTimer = setInterval(updateCountdown, 1000);
+    const resendTimer = setInterval(updateResend, 1000);
+})();
+</script>
+{% endif %}
+{% endblock %}

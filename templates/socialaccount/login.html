@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Вход через Google{% endblock %}
+
+{% block content %}
+<h1 class="page-title">Вход через Google</h1>
+<section class="login-wrap">
+    <section class="glass-card stack">
+        <h2 class="mt-0">Подтвердите вход</h2>
+        <p class="text-14">
+            Вы собираетесь войти, используя учетную запись Google.
+            Нажмите кнопку ниже, чтобы продолжить.
+        </p>
+        <form method="post" class="stack">
+            {% csrf_token %}
+            <button type="submit">Продолжить</button>
+            <a href="{% url 'login' %}" class="btn btn-secondary text-center">Вернуться к входу</a>
+        </form>
+    </section>
+
+    <aside class="side-stack">
+        <section class="glass-card">
+            <p class="mini-title">Безопасность</p>
+            <p class="text-14 mb-8">
+                Мы не получаем доступ к вашему паролю Google.
+            </p>
+            <p class="text-14">
+                Доступ будет ограничен базовой информацией профиля.
+            </p>
+        </section>
+    </aside>
+</section>
+{% endblock %}
