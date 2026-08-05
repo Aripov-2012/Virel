@@ -61,7 +61,7 @@ ROOT_URLCONF = 'simple_blog.urls'
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.DjangoTemplates',
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',  # <-- Проверьте здесь!
         'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -73,7 +73,6 @@ TEMPLATES = [
         },
     },
 ]
-
 WSGI_APPLICATION = 'simple_blog.wsgi.application'
 ASGI_APPLICATION = 'simple_blog.asgi.application'
 
