@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Создать рил{% endblock %}
+
+{% block content %}
+<h1 class="page-title">Создать рил</h1>
+<section class="layout-three">
+    <aside class="side-stack">
+        <section class="glass-card">
+            <p class="mini-title">Навигация</p>
+            <div class="list-links">
+                <a href="{% url 'reels_feed' %}" class="btn btn-secondary">← Все рилсы</a>
+                <a href="{% url 'blog_page' %}" class="btn btn-secondary">Лента</a>
+            </div>
+        </section>
+    </aside>
+
+    <section class="glass-card">
+        <h2 class="mt-0">Новый рил</h2>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert--{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST" enctype="multipart/form-data" class="stack" id="createReelForm">
+            {% csrf_token %}
+
+            <div>
+                <label for="reelVideo">Видео <span class="required">*</span></label>
+                <input
+                    type="file"
+                    id="reelVideo"
+                    name="video"
+                    accept="video/mp4,video/mov,video/webm,video/x-m4v,.mp4,.mov,.webm,.m4v"
+                    required
+                >
+                <p class="field-hint">Поддерживаются форматы MP4, MOV, WebM, M4V. Вертикальное видео смотрится лучше.</p>
+            </div>
+
+            <!-- Превью выбранного видео -->
+            <div id="reelPreviewWrap" style="display:none;">
+                <video
+                    id="reelPreview"
+                    controls
+                    muted
+                    style="width:100%;max-height:360px;border-radius:12px;background:#000;"
+                ></video>
+            </div>
+
+            <div>
+                <label for="reelDescription">Описание</label>
+                <textarea
+                    id="reelDescription"
+                    name="description"
+                    rows="3"
+                    placeholder="Расскажите о вашем риле…"
+                    maxlength="500"
+                ></textarea>
+                <p class="field-hint">До 500 символов.</p>
+            </div>
+
+            <button type="submit" class="btn-primary-sm" id="submitReelBtn">Опубликовать</button>
+        </form>
+    </section>
+
+    <aside class="side-stack">
+        <section class="glass-card">
+            <p class="mini-title">Советы</p>
+            <ul class="stat-list" style="gap:8px;">
+                <li style="font-size:.85rem;color:var(--text-muted,#888);">📱 Снимайте вертикально (9:16)</li>
+                <li style="font-size:.85rem;color:var(--text-muted,#888);">⏱ Короткие видео смотрят до конца</li>
+                <li style="font-size:.85rem;color:var(--text-muted,#888);">🎵 Добавьте музыку при монтаже</li>
+            </ul>
+        </section>
+    </aside>
+</section>
+
+<script>
+(function () {
+    var input = document.getElementById('reelVideo');
+    var previewWrap = document.getElementById('reelPreviewWrap');
+    var preview = document.getElementById('reelPreview');
+
+    input.addEventListener('change', function () {
+        var file = this.files[0];
+        if (!file) { previewWrap.style.display = 'none'; return; }
+        var url = URL.createObjectURL(file);
+        preview.src = url;
+        previewWrap.style.display = 'block';
+        preview.onloadedmetadata = function () { URL.revokeObjectURL(url); };
+    });
+
+    document.getElementById('createReelForm').addEventListener('submit', function () {
+        var btn = document.getElementById('submitReelBtn');
+        btn.disabled = true;
+        btn.textContent = 'Загрузка…';
+    });
+}());
+</script>
+{% endblock %}

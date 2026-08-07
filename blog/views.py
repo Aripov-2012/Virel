@@ -9,9 +9,10 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
 from django.contrib.auth.models import User
-from .models import Blog, Comment, Subscription, Profile, Conversation, Message, Tag, PostView, SavedPost, PhoneVerification
+from .models import Blog, Comment, Subscription, Profile, Conversation, Message, Tag, PostView, SavedPost, PhoneVerification, Reel
 from .sms import send_sms
 User = get_user_model()
+import os
 
 class LoginWithStats(LoginView):
     template_name = "registration/login.html"
@@ -957,3 +958,81 @@ def saved_posts_page(request):
             'following_ids': following_ids,
         },
     )
+
+
+# ── REELS ────────────────────────────────────────────────────────────────────
+
+def reels_feed(request):
+    """Вертикальная лента рилсов."""
+    reels = (
+        Reel.objects.select_related('author__profile')
+        .prefetch_related('likes')
+        .order_by('-created_at')
+    )
+    liked_reel_ids = set()
+    if request.user.is_authenticated:
+        liked_reel_ids = set(
+            Reel.objects.filter(likes=request.user).values_list('id', flat=True)
+        )
+    return render(request, 'reels.html', {
+        'reels': reels,
+        'liked_reel_ids': liked_reel_ids,
+    })
+
+
+@login_required
+def create_reel(request):
+    """Создание нового рила."""
+    if request.method == 'POST':
+        video = request.FILES.get('video')
+        description = request.POST.get('description', '').strip()
+
+        if not video:
+            messages.error(request, 'Выберите видеофайл.')
+            return render(request, 'create_reel.html')
+
+        # Разрешённые форматы
+        allowed_exts = {'.mp4', '.mov', '.webm', '.m4v'}
+        ext = os.path.splitext(video.name)[1].lower()
+        if ext not in allowed_exts:
+            messages.error(request, 'Поддерживаются только форматы MP4, MOV, WebM, M4V.')
+            return render(request, 'create_reel.html')
+
+        Reel.objects.create(
+            author=request.user,
+            video=video,
+            description=description,
+        )
+        messages.success(request, 'Рил опубликован!')
+        return redirect('reels_feed')
+
+    return render(request, 'create_reel.html')
+
+
+@login_required
+def delete_reel(request, reel_id):
+    """Удаление рила (только автор)."""
+    reel = get_object_or_404(Reel, id=reel_id, author=request.user)
+    if request.method == 'POST':
+        reel.video.delete(save=False)
+        reel.delete()
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({'ok': True})
+        return redirect('reels_feed')
+    return JsonResponse({'ok': False}, status=405)
+
+
+@login_required
+def toggle_reel_like(request, reel_id):
+    """Лайк / анлайк рила."""
+    reel = get_object_or_404(Reel, id=reel_id)
+    if request.method == 'POST':
+        if reel.likes.filter(id=request.user.id).exists():
+            reel.likes.remove(request.user)
+            liked = False
+        else:
+            reel.likes.add(request.user)
+            liked = True
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({'ok': True, 'liked': liked, 'likes_count': reel.likes.count()})
+    return redirect('reels_feed')

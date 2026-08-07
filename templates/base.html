@@ -30,6 +30,7 @@
         <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.8"/><path d="M2.6 20.4a6.6 6.6 0 0 1 12.8 0M16.4 4.6a3.8 3.8 0 0 1 0 6.9M18 20.4a6.6 6.6 0 0 0-2.2-4.9"/></symbol>
         <symbol id="i-logout" viewBox="0 0 24 24"><path d="M14.5 3.5h4a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2h-4M9.5 16 5.5 12l4-4M5.5 12H15"/></symbol>
         <symbol id="i-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M19.3 14.3a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.03 1.56V20a2 2 0 1 1-4 0v-.09A1.7 1.7 0 0 0 8.8 18.3a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.56-1.03H2a2 2 0 1 1 0-4h.09A1.7 1.7 0 0 0 3.7 8.8a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34H8.8a1.7 1.7 0 0 0 1.03-1.56V2a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1.03 1.56 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87V8.8a1.7 1.7 0 0 0 1.56 1.03H22a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.56 1.03Z"/></symbol>
+        <symbol id="i-reels" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="4"/><circle cx="12" cy="12" r="3.5"/><circle cx="7" cy="4.5" r="1.2"/><circle cx="12" cy="4.5" r="1.2"/><circle cx="17" cy="4.5" r="1.2"/><circle cx="7" cy="19.5" r="1.2"/><circle cx="12" cy="19.5" r="1.2"/><circle cx="17" cy="19.5" r="1.2"/></symbol>
     </svg>
 
     <header class="header">
@@ -38,6 +39,7 @@
 
             <nav>
                 <a href="{% url 'blog_page' %}">Лента</a>
+                <a href="{% url 'reels_feed' %}">Reels</a>
                 {% if user.is_authenticated %}
                     <a href="{% url 'for_you_feed' %}">Для вас</a>
                     <a href="{% url 'subscriptions_feed' %}">Подписки</a>
@@ -93,6 +95,9 @@
                 <a class="btn btn-secondary" href="{% url 'blog_page' %}">
                     <svg class="ic" aria-hidden="true"><use href="#i-grid"></use></svg> Лента
                 </a>
+                <a class="btn btn-secondary" href="{% url 'reels_feed' %}">
+                    <svg class="ic" aria-hidden="true"><use href="#i-reels"></use></svg> Reels
+                </a>
                 {% if user.is_authenticated %}
                     <a class="btn btn-secondary" href="{% url 'for_you_feed' %}">
                         <svg class="ic" aria-hidden="true"><use href="#i-compass"></use></svg> Для вас
@@ -142,8 +147,8 @@
             <a class="dock-btn {% if nav == 'blog_page' %}is-active{% endif %}" href="{% url 'blog_page' %}" aria-label="Лента">
                 <svg class="ic" aria-hidden="true"><use href="#i-home"></use></svg>
             </a>
-            <a class="dock-btn {% if nav == 'for_you_feed' %}is-active{% endif %}" href="{% if user.is_authenticated %}{% url 'for_you_feed' %}{% else %}{% url 'login' %}{% endif %}" aria-label="Для вас">
-                <svg class="ic" aria-hidden="true"><use href="#i-compass"></use></svg>
+            <a class="dock-btn {% if nav == 'reels_feed' %}is-active{% endif %}" href="{% url 'reels_feed' %}" aria-label="Reels">
+                <svg class="ic" aria-hidden="true"><use href="#i-reels"></use></svg>
             </a>
             <a class="dock-btn dock-create {% if nav == 'create_post' %}is-active{% endif %}" href="{% if user.is_authenticated %}{% url 'create_post' %}{% else %}{% url 'login' %}{% endif %}" aria-label="Создать пост">
                 <svg class="ic" aria-hidden="true"><use href="#i-plus"></use></svg>

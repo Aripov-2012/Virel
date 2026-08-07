@@ -3,7 +3,8 @@
     "allow": [
       "Bash(python3 -)",
       "Bash(google-chrome --headless=new --disable-gpu --no-sandbox --virtual-time-budget=4000 --window-size=390,900 --dump-dom \"file:///tmp/shots/probe.html\")",
-      "Bash(python3 -c ' *)"
+      "Bash(python3 -c ' *)",
+      "Bash(python manage.py makemigrations blog --name reel)"
     ]
   }
 }

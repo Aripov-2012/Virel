@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Reels{% endblock %}
+{% block body_class %}reels-page{% endblock %}
+
+{% block extra_head %}
+<style>
+/* Reels-specific overrides (full-screen layout) */
+.site-wrap { padding: 0 !important; max-width: 100% !important; }
+.footer-note { display: none; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="reels-shell" id="reelsShell">
+
+    {% if not reels %}
+        <div class="reels-empty">
+            <p>Рилсов пока нет.</p>
+            {% if user.is_authenticated %}
+                <a class="btn-primary-sm" href="{% url 'create_reel' %}">Создать первый рил</a>
+            {% endif %}
+        </div>
+    {% endif %}
+
+    {% for reel in reels %}
+    <div class="reel-item" id="reel-{{ reel.id }}" data-reel-id="{{ reel.id }}">
+
+        <!-- Видео -->
+        <video
+            class="reel-video"
+            src="{{ reel.video.url }}"
+            loop
+            muted
+            playsinline
+            preload="none"
+        ></video>
+
+        <!-- Оверлей: правая панель действий -->
+        <div class="reel-sidebar">
+            <!-- Аватар автора -->
+            <a class="reel-avatar-wrap" href="{% url 'profile_page' reel.author.id %}">
+                <span class="reel-avatar">
+                    {% if reel.author.profile.avatar %}
+                        <img src="{{ reel.author.profile.avatar.url }}" alt="{{ reel.author.username }}">
+                    {% else %}
+                        {{ reel.author.username|slice:":1"|upper }}
+                    {% endif %}
+                </span>
+            </a>
+
+            <!-- Лайк -->
+            {% if user.is_authenticated %}
+            <form method="post" action="{% url 'toggle_reel_like' reel.id %}" class="reel-action-form js-reel-like-form">
+                {% csrf_token %}
+                <button type="submit"
+                    class="reel-action-btn js-reel-like-btn {% if reel.id in liked_reel_ids %}active{% endif %}"
+                    aria-label="Лайк">
+                    <svg class="ic" aria-hidden="true"><use href="#i-heart"></use></svg>
+                    <span class="reel-action-count js-reel-likes-count">{{ reel.likes.count }}</span>
+                </button>
+            </form>
+            {% else %}
+            <a class="reel-action-btn" href="{% url 'login' %}" aria-label="Лайк">
+                <svg class="ic" aria-hidden="true"><use href="#i-heart"></use></svg>
+                <span class="reel-action-count">{{ reel.likes.count }}</span>
+            </a>
+            {% endif %}
+
+            <!-- Удалить (только автор) -->
+            {% if user.is_authenticated and reel.author_id == user.id %}
+            <form method="post" action="{% url 'delete_reel' reel.id %}" class="reel-action-form js-reel-delete-form">
+                {% csrf_token %}
+                <button type="submit" class="reel-action-btn reel-action-btn--danger" aria-label="Удалить">
+                    <svg class="ic" aria-hidden="true"><use href="#i-close"></use></svg>
+                </button>
+            </form>
+            {% endif %}
+        </div>
+
+        <!-- Нижняя информация -->
+        <div class="reel-info">
+            <a class="reel-author" href="{% url 'profile_page' reel.author.id %}">@{{ reel.author.username }}</a>
+            {% if reel.description %}
+                <p class="reel-description">{{ reel.description }}</p>
+            {% endif %}
+        </div>
+
+        <!-- Кнопка play/pause по центру (показывается при паузе) -->
+        <button class="reel-play-hint js-reel-play-hint" aria-label="Воспроизвести/Пауза">
+            <svg viewBox="0 0 24 24" width="48" height="48" fill="white" aria-hidden="true">
+                <path d="M8 5.5v13l10-6.5z"/>
+            </svg>
+        </button>
+
+    </div>
+    {% endfor %}
+
+</div>
+
+<!-- Кнопка создания -->
+{% if user.is_authenticated %}
+<a class="reels-create-fab" href="{% url 'create_reel' %}" aria-label="Создать рил">
+    <svg class="ic" aria-hidden="true"><use href="#i-plus"></use></svg>
+</a>
+{% endif %}
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{% static 'js/reels.js' %}" defer></script>
+{% endblock %}

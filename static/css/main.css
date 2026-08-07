@@ -1454,3 +1454,212 @@ input[type="checkbox"] { width: 20px; height: 20px; min-height: 0; accent-color:
 @media (min-width: 1100px) {
     .site-wrap { max-width: 975px; }
 }
+
+/* ==========================================================================
+   Reels — вертикальная видео-лента (TikTok / Instagram Reels стиль)
+   ========================================================================== */
+
+/* Страница рилсов: убираем паддинги site-wrap через body-class */
+body.reels-page .bottom-dock { display: none; }
+
+.reels-shell {
+    position: fixed;
+    inset: 0;
+    top: 0;          /* перекрываем хедер */
+    overflow-y: scroll;
+    scroll-snap-type: y mandatory;
+    -webkit-overflow-scrolling: touch;
+    background: #000;
+    z-index: 10;
+}
+
+/* Каждый рил занимает 100% высоты экрана */
+.reel-item {
+    position: relative;
+    width: 100%;
+    height: 100svh;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    overflow: hidden;
+    background: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Видео — объект-cover по всему контейнеру */
+.reel-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    cursor: pointer;
+}
+
+/* Правая панель действий */
+.reel-sidebar {
+    position: absolute;
+    right: 12px;
+    bottom: 100px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    z-index: 2;
+}
+
+.reel-avatar-wrap { display: block; }
+.reel-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: var(--blue);
+    color: #fff;
+    font-weight: 700;
+    font-size: .95rem;
+    border: 2px solid #fff;
+}
+.reel-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+.reel-action-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    background: none;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    padding: 0;
+    text-shadow: 0 1px 3px rgba(0,0,0,.6);
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,.5));
+    text-decoration: none;
+}
+.reel-action-btn .ic {
+    width: 28px;
+    height: 28px;
+    stroke: #fff;
+    fill: none;
+    stroke-width: 1.8;
+}
+.reel-action-btn.active .ic { fill: var(--red); stroke: var(--red); }
+.reel-action-btn--danger .ic { stroke: var(--red); }
+.reel-action-count {
+    font-size: .75rem;
+    font-weight: 600;
+    color: #fff;
+}
+
+/* Нижняя информация об авторе и описании */
+.reel-info {
+    position: absolute;
+    left: 12px;
+    right: 70px;
+    bottom: 80px;
+    z-index: 2;
+    color: #fff;
+    text-shadow: 0 1px 4px rgba(0,0,0,.7);
+}
+.reel-author {
+    display: block;
+    font-weight: 700;
+    font-size: .95rem;
+    color: #fff;
+    text-decoration: none;
+    margin-bottom: 4px;
+}
+.reel-author:hover { text-decoration: underline; }
+.reel-description {
+    margin: 0;
+    font-size: .875rem;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Пустое состояние */
+.reels-empty {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    color: #fff;
+    background: #000;
+    z-index: 10;
+}
+
+/* Кнопка play/pause по центру (fade при автовоспроизведении) */
+.reel-play-hint {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity .2s;
+    z-index: 3;
+    pointer-events: none;
+}
+.reel-play-hint.show {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* FAB кнопка создания рила */
+.reels-create-fab {
+    position: fixed;
+    top: 14px;
+    right: 14px;
+    z-index: 20;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.15);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    text-decoration: none;
+}
+.reels-create-fab .ic {
+    width: 22px;
+    height: 22px;
+    stroke: #fff;
+    fill: none;
+    stroke-width: 2;
+}
+
+/* Десктоп: центрируем рил в колонке */
+@media (min-width: 768px) {
+    body.reels-page .header { display: none; }
+
+    .reels-shell {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .reel-item {
+        max-width: 420px;
+        width: 100%;
+    }
+    .reels-create-fab {
+        top: 20px;
+        right: calc(50% - 230px);
+    }
+}

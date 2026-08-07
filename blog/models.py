@@ -221,6 +221,28 @@ class PostView(models.Model):
         return f'{self.user} viewed {self.post}'
 
 
+class Reel(models.Model):
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='reels',
+    )
+    video = models.FileField(upload_to='reels/')
+    description = models.TextField(blank=True)
+    likes = models.ManyToManyField(
+        settings.AUTH_USER_MODEL,
+        related_name='liked_reels',
+        blank=True,
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f'Reel({self.id}) by {self.author}'
+
+
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def create_profile(sender, instance, created, **kwargs):
     if created:

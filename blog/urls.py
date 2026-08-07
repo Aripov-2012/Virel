@@ -6,7 +6,9 @@ from .views import (
     admin_page,
     blog_page,
     create_post,
+    create_reel,
     delete_post,
+    delete_reel,
     edit_profile,
     chat_list,
     chat_room,
@@ -17,11 +19,13 @@ from .views import (
     profile_page,
     register,
     register_phone,
+    reels_feed,
     saved_posts_page,
     start_chat,
     subscriptions_feed,
     toggle_comment_like,
     toggle_post_like,
+    toggle_reel_like,
     toggle_save_post,
     toggle_subscription,
     track_post_view,
@@ -53,6 +57,9 @@ urlpatterns = [
     path('chats/<int:conversation_id>/', chat_room, name='chat_room'),
     path('save/<int:id>/', toggle_save_post, name='toggle_save_post'),
     path('saved/', saved_posts_page, name='saved_posts_page'),
+    # Reels
+    path('reels/', reels_feed, name='reels_feed'),
+    path('reels/create/', create_reel, name='create_reel'),
+    path('reels/<int:reel_id>/delete/', delete_reel, name='delete_reel'),
+    path('reels/<int:reel_id>/like/', toggle_reel_like, name='toggle_reel_like'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-
-
